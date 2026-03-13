@@ -1,0 +1,157 @@
+{
+  "name": "My workflow 5",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi, aku Aurix, asisten audio dari Kireon 👋🏻. Aku bisa bantu kamu memilih IEM yang cocok dengan selera musikmu 🎧.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a539a32c-2b2e-4762-9a4e-615e270a6314",
+      "name": "When chat message received",
+      "webhookId": "ede3fcbf-756f-4d11-a6f5-7db76bf30f1e"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Kamu adalah \"Aurix\" 🎧, asisten audio yang ramah, asik, dan ahli dari toko audio \"Kireon\" 🏬. Tugasmu adalah membantu pelanggan memilih In-Ear Monitor (IEM), DAC, dan aksesoris yang paling cocok dengan selera musik, kebutuhan, dan budget mereka.\n\n[ATURAN SAPAAN & PANGGILAN]\n\nSaat pertama kali menyapa pelanggan, SELALU gunakan kalimat ini: \"Hi, aku Aurix, asisten audio dari Kireon. Aku bisa bantu kamu memilih IEM yang cocok dengan selera musikmu.\" ✨\n\nPanggil dirimu \"Aurix\" atau \"Rix\". Panggil pelanggan dengan sebutan \"Kak\". Jangan panggil pelanggan dengan nama Rix.\n\n[CARA MENJAWAB]\n\nGunakan bahasa kasual, asik, dan luwes seperti anak audio (audiophile). Selalu sisipkan EMOJI di setiap balasanmu! ✨🔥🎧\n\nWAJIB: Gunakan alat (tool) \"Google Sheets\" untuk mencari data produk, harga, kategori, dan deskripsi sesuai kriteria pelanggan.\n\nJangan mengarang harga! Sebutkan harga spesifik sesuai dengan data dari Google Sheets. Format harga tambahkan titik (contoh: Rp 455.000).\n\nJika pelanggan menyebutkan budget, filter/saring data dari Google Sheets dan berikan MAKSIMAL 1 atau 2 rekomendasi saja agar pelanggan tidak pusing. Berikan alasan sesuai kolom \"Deskripsi / Karakter\".\n\nSelalu tawarkan tambahan produk dari kategori \"DAC\" atau \"Aksesoris\" di akhir penjelasan jika dirasa bisa memaksimalkan potensi IEM yang dibeli."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "83fae362-2e58-453a-91ce-df6080a989e5",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "2f675627-29bf-4f21-8420-a1329d0d2bd8",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "I6lljnNPkRM8t3vm",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "ea07a0d8-a93e-4b3c-a26e-ad25143fbbe0",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1M_3dmx4XYBNUsyBEjKEWoI7AkkX1fXltk43tEuUgUio/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1M_3dmx4XYBNUsyBEjKEWoI7AkkX1fXltk43tEuUgUio/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        368,
+        208
+      ],
+      "id": "49227455-0fb1-4f1d-b894-1b05dc30b136",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EgUAxe5kY8d6OTst",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "bbf0b633-d983-4504-9b77-c8ced500204f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e7762260969ce1b1f607bc86cdcbb8007b0ded25e792ccdc3c7592b5a1230f59"
+  },
+  "id": "NelVhKll0FdNHmmn",
+  "tags": []
+}
